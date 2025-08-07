@@ -14,78 +14,79 @@ function booklist_api_endpoint_callback( $request ) {
     // Author array 
     $authorTerms = get_the_terms( get_the_ID(), 'author' );
     $authorArray = array();
-    foreach($authorTerms as $author) {
-      array_push($authorArray, array(
-        'authorId' => $author->term_id,
-        'name' => $author->name,
-        'slug' => $author->slug
-      ));
-    }
-    
-    // Series Array
-    $seriesTerms = get_the_terms( get_the_ID(), 'series' );
-    $seriesArray = array();
-    foreach($seriesTerms as $series) {
-      array_push($seriesArray, array(
-        'seriesId' => $series->term_id,
-        'name' => $series->name,
-        'slug' => $series->slug
-      ));
+    if(is_array($authorTerms) || is_object($authorTerms)) {
+      foreach($authorTerms as $author) {
+        array_push($authorArray, array(
+          'authorId' => $author->term_id,
+          'name' => $author->name,
+          'slug' => $author->slug
+        ));
+      }
     }
 
     // Series Array
     $seriesTerms = get_the_terms( get_the_ID(), 'series' );
     $seriesArray = array();
-    foreach($seriesTerms as $series) {
-      array_push($seriesArray, array(
-        'seriesId' => $series->term_id,
-        'name' => $series->name,
-        'slug' => $series->slug
-      ));
+    if(is_array($seriesTerms) || is_object($seriesTerms)) {
+      foreach($seriesTerms as $series) {
+        array_push($seriesArray, array(
+          'seriesId' => $series->term_id,
+          'name' => $series->name,
+          'slug' => $series->slug
+        ));
+      }
     }
     
     // Genre Array
     $genreTerms = get_the_terms( get_the_ID(), 'genre' );
     $genreArray = array();
-    foreach($genreTerms as $genre) {
-      array_push($genreArray, array(
-        'genreId' => $genre->term_id,
-        'name' => $genre->name,
-        'slug' => $genre->slug
-      ));
+    if(is_array($genreTerms) || is_object($genreTerms)) {
+      foreach($genreTerms as $genre) {
+        array_push($genreArray, array(
+          'genreId' => $genre->term_id,
+          'name' => $genre->name,
+          'slug' => $genre->slug
+        ));
+      }
     }
     
     // Trope Array
     $tropeTerms = get_the_terms( get_the_ID(), 'trope' );
     $tropeArray = array();
-    foreach($tropeTerms as $trope) {
-      array_push($tropeArray, array(
-        'tropeId' => $trope->term_id,
-        'name' => $trope->name,
-        'slug' => $trope->slug
-      ));
+    if(is_array($tropeTerms) || is_object($tropeTerms)) {
+      foreach($tropeTerms as $trope) {
+        array_push($tropeArray, array(
+          'tropeId' => $trope->term_id,
+          'name' => $trope->name,
+          'slug' => $trope->slug
+        ));
+      }
     }
     
     // Creature Array
     $creatureTerms = get_the_terms( get_the_ID(), 'creature' );
     $creatureArray = array();
-    foreach($creatureTerms as $creature) {
-      array_push($creatureArray, array(
-        'creatureId' => $creature->term_id,
-        'name' => $creature->name,
-        'slug' => $creature->slug
-      ));
+    if(is_array($creatureTerms) || is_object($creatureTerms)) {
+      foreach($creatureTerms as $creature) {
+        array_push($creatureArray, array(
+          'creatureId' => $creature->term_id,
+          'name' => $creature->name,
+          'slug' => $creature->slug
+        ));
+      }
     }
 
     // BookTag Array
     $booktagTerms = get_the_terms( get_the_ID(), 'booktag' );
     $booktagArray = array();
-    foreach($booktagTerms as $booktag) {
-      array_push($booktagArray, array(
-        'booktagId' => $booktag->term_id,
-        'name' => $booktag->name,
-        'slug' => $booktag->slug
-      ));
+    if(is_array($booktagTerms) || is_object($booktagTerms)) {
+      foreach($booktagTerms as $booktag) {
+        array_push($booktagArray, array(
+          'booktagId' => $booktag->term_id,
+          'name' => $booktag->name,
+          'slug' => $booktag->slug
+        ));
+      }
     }
 
 
@@ -94,6 +95,7 @@ function booklist_api_endpoint_callback( $request ) {
     array_push($bookResults, array(
       'bookId' => get_the_ID(),
       'title' => get_the_title(),
+      'slug' => get_post_field('post_name'),
       'author' => $authorArray,
       'series' => $seriesArray,
       'image' => get_field('image'),
