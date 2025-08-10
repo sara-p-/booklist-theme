@@ -1,6 +1,9 @@
 <?php
+
+require get_theme_file_path( '/util/util.php' );
+
 // Callback that supplies a custom data array for the custom API endpoint
-function booklist_api_endpoint_callback( $request ) {
+function booklist_all_books_api_endpoint_callback( $request ) {
   $mainQuery = new WP_Query(array(
     'post_type' => array('book'),
     'posts_per_page' => -1
@@ -11,85 +14,13 @@ function booklist_api_endpoint_callback( $request ) {
   while($mainQuery->have_posts()) {
     $mainQuery->the_post();
 
-    // Author array 
-    $authorTerms = get_the_terms( get_the_ID(), 'author' );
-    $authorArray = array();
-    if(is_array($authorTerms) || is_object($authorTerms)) {
-      foreach($authorTerms as $author) {
-        array_push($authorArray, array(
-          'authorId' => $author->term_id,
-          'name' => $author->name,
-          'slug' => $author->slug
-        ));
-      }
-    }
-
-    // Series Array
-    $seriesTerms = get_the_terms( get_the_ID(), 'series' );
-    $seriesArray = array();
-    if(is_array($seriesTerms) || is_object($seriesTerms)) {
-      foreach($seriesTerms as $series) {
-        array_push($seriesArray, array(
-          'seriesId' => $series->term_id,
-          'name' => $series->name,
-          'slug' => $series->slug
-        ));
-      }
-    }
+    $authorArray = createTermArray(get_the_ID(), 'author');
+    $seriesArray = createTermArray(get_the_ID(), 'series');
+    $genreArray = createTermArray(get_the_ID(), 'genre');
+    $tropeArray = createTermArray(get_the_ID(), 'trope');
+    $creatureArray = createTermArray(get_the_ID(), 'creature');
+    $booktagArray = createTermArray(get_the_ID(), 'booktag');
     
-    // Genre Array
-    $genreTerms = get_the_terms( get_the_ID(), 'genre' );
-    $genreArray = array();
-    if(is_array($genreTerms) || is_object($genreTerms)) {
-      foreach($genreTerms as $genre) {
-        array_push($genreArray, array(
-          'genreId' => $genre->term_id,
-          'name' => $genre->name,
-          'slug' => $genre->slug
-        ));
-      }
-    }
-    
-    // Trope Array
-    $tropeTerms = get_the_terms( get_the_ID(), 'trope' );
-    $tropeArray = array();
-    if(is_array($tropeTerms) || is_object($tropeTerms)) {
-      foreach($tropeTerms as $trope) {
-        array_push($tropeArray, array(
-          'tropeId' => $trope->term_id,
-          'name' => $trope->name,
-          'slug' => $trope->slug
-        ));
-      }
-    }
-    
-    // Creature Array
-    $creatureTerms = get_the_terms( get_the_ID(), 'creature' );
-    $creatureArray = array();
-    if(is_array($creatureTerms) || is_object($creatureTerms)) {
-      foreach($creatureTerms as $creature) {
-        array_push($creatureArray, array(
-          'creatureId' => $creature->term_id,
-          'name' => $creature->name,
-          'slug' => $creature->slug
-        ));
-      }
-    }
-
-    // BookTag Array
-    $booktagTerms = get_the_terms( get_the_ID(), 'booktag' );
-    $booktagArray = array();
-    if(is_array($booktagTerms) || is_object($booktagTerms)) {
-      foreach($booktagTerms as $booktag) {
-        array_push($booktagArray, array(
-          'booktagId' => $booktag->term_id,
-          'name' => $booktag->name,
-          'slug' => $booktag->slug
-        ));
-      }
-    }
-
-
 
     // Push everything into the bookResults array
     array_push($bookResults, array(
@@ -121,16 +52,83 @@ function booklist_api_endpoint_callback( $request ) {
     ));
   }
 	
-
-
     return rest_ensure_response( $bookResults );
 }
 
+function booklist_single_book_api_endpoint_callback($request) {
+  $slug = $request['slug'];
+  $books = [];
+  $results = [];
+
+  if($slug) {
+    $books = get_posts(array(
+      'name' => $slug,
+      'post_type'      => 'book',
+      'post_status'    => 'publish',
+      'posts_per_page' => 1
+    ));
+  } 
+
+
+  if ( empty( $books ) ) {
+    return new WP_Error( 'no_book', 'Invalid book', array( 'status' => 404 ) );
+  }
+  else {
+    $bookId = $books[0]->ID;
+    $authorArray = createTermArray($bookId, 'author');
+    $seriesArray = createTermArray($bookId, 'series');
+    $genreArray = createTermArray($bookId, 'genre');
+    $tropeArray = createTermArray($bookId, 'trope');
+    $creatureArray = createTermArray($bookId, 'creature');
+    $booktagArray = createTermArray($bookId, 'booktag');
+
+    $results = array(
+      'bookId' => $bookId,
+        'title' => get_the_title($bookId),
+        'slug' => get_post_field( 'post_name', $bookId ),
+        'author' => $authorArray,
+        'series' => $seriesArray,
+        'image' => get_field('image', $bookId),
+        'genres' => $genreArray,
+        'tropes' => $tropeArray,
+        'creatures' => $creatureArray,
+        'booktags' => $booktagArray,
+        'bookNumber' => get_field('book_number', $bookId),
+        'publishDate' => get_field('publish_date', $bookId),
+        'length' => get_field('length', $bookId),
+        'rating' => get_field('rating', $bookId),
+        'spice' => get_field('spice', $bookId),
+        'finished' => get_field('finished', $bookId),
+        'amountCompleted' => get_field('amount_completed', $bookId),
+        'display' => get_field('display', $bookId),
+        'description' => get_field('description', $bookId),
+        'notes' => get_field('notes', $bookId),
+        'smell' => get_field('smell', $bookId),
+        'startDate' => get_field('start_date', $bookId),
+        'finishDate' => get_field('finish_date', $bookId),
+        'goodreadsLink' => get_field('goodreads_link', $bookId),
+        'amazonLink' => get_field('amazon_link', $bookId),
+    );
+  }
+
+  return $results;
+
+}
+
+
 // Adds theme support for custom books API endpoint
 function register_booklist_api_endpoint() {
+  // Register the route to fetch all of the books
     register_rest_route( 'booklist/v1', '/books/', array(
         'methods'             => WP_REST_SERVER::READABLE,
-        'callback'            => 'booklist_api_endpoint_callback',
+        'callback'            => 'booklist_all_books_api_endpoint_callback',
+        'permission_callback' => '__return_true', // For public access, or define a custom permission check
+    ));
+
+  // Register the route to fetch one of the books
+    register_rest_route( 'booklist/v1', '/book/', array(
+        'methods'             => WP_REST_SERVER::READABLE,
+        'callback'            => 'booklist_single_book_api_endpoint_callback',
         'permission_callback' => '__return_true', // For public access, or define a custom permission check
     ));
 }
