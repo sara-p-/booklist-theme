@@ -21,35 +21,37 @@ function booklist_all_books_api_endpoint_callback( $request ) {
     $creatureArray = createTermArray(get_the_ID(), 'creature');
     $booktagArray = createTermArray(get_the_ID(), 'booktag');
     
-
+    if(get_field('display') === true) {
     // Push everything into the bookResults array
-    array_push($bookResults, array(
-      'bookId' => get_the_ID(),
-      'title' => get_the_title(),
-      'slug' => get_post_field('post_name'),
-      'authors' => $authorArray,
-      'series' => $seriesArray,
-      'image' => get_field('image'),
-      'genres' => $genreArray,
-      'tropes' => $tropeArray,
-      'creatures' => $creatureArray,
-      'booktags' => $booktagArray,
-      'bookNumber' => get_field('book_number'),
-      'publishDate' => get_field('publish_date'),
-      'length' => get_field('length'),
-      'rating' => get_field('rating'),
-      'spice' => get_field('spice'),
-      'finished' => get_field('finished'),
-      'amountCompleted' => get_field('amount_completed'),
-      'display' => get_field('display'),
-      'description' => get_field('description'),
-      'notes' => get_field('notes'),
-      'smell' => get_field('smell'),
-      'startDate' => get_field('start_date'),
-      'finishDate' => get_field('finish_date'),
-      'goodreadsLink' => get_field('goodreads_link'),
-      'amazonLink' => get_field('amazon_link'),
-    ));
+        array_push($bookResults, array(
+          'bookId' => get_the_ID(),
+          'title' => get_the_title(),
+          'slug' => get_post_field('post_name'),
+          'authors' => $authorArray,
+          'series' => $seriesArray,
+          'image' => get_field('image'),
+          'genres' => $genreArray,
+          'tropes' => $tropeArray,
+          'creatures' => $creatureArray,
+          'booktags' => $booktagArray,
+          'bookNumber' => get_field('book_number'),
+          'publishDate' => get_field('publish_date'),
+          'length' => get_field('length'),
+          'rating' => get_field('rating'),
+          'spice' => get_field('spice'),
+          'finished' => get_field('finished'),
+          'amountCompleted' => get_field('amount_completed'),
+          'display' => get_field('display'),
+          'description' => get_field('description'),
+          'notes' => get_field('notes'),
+          'smell' => get_field('smell'),
+          'startDate' => get_field('start_date'),
+          'finishDate' => get_field('finish_date'),
+          'goodreadsLink' => get_field('goodreads_link'),
+          'amazonLink' => get_field('amazon_link'),
+        ));
+    }
+    
   }
 	
     return rest_ensure_response( $bookResults );
