@@ -4,13 +4,17 @@ require get_theme_file_path( '/util/util.php' );
 
 // Callback that supplies a custom data array for the custom API endpoint
 function booklist_all_books_api_endpoint_callback( $request ) {
+  // Create an empty array that will eventually hold all of the book data.
+  // This is what we will return in the response
+  $data = array();
+
+  // Create the Custom WP Query to return all of the books
   $mainQuery = new WP_Query(array(
     'post_type' => array('book'),
     'posts_per_page' => -1
   ));
 
-  $bookResults = array();
-
+  // Create the custom array with values pulled from the query loop
   while($mainQuery->have_posts()) {
     $mainQuery->the_post();
 
@@ -22,8 +26,8 @@ function booklist_all_books_api_endpoint_callback( $request ) {
     $booktagArray = createTermArray(get_the_ID(), 'booktag');
     
     if(get_field('display') === true) {
-    // Push everything into the bookResults array
-        array_push($bookResults, array(
+    // Push everything into the data array
+        array_push($data, array(
           'bookId' => get_the_ID(),
           'title' => get_the_title(),
           'slug' => get_post_field('post_name'),
@@ -53,8 +57,19 @@ function booklist_all_books_api_endpoint_callback( $request ) {
     }
     
   }
-	
-    return rest_ensure_response( $bookResults );
+
+  // Construct the array that will be converted into a WP_REST_Response object
+  $response_array = array(
+    'message' => 'Books response success!',
+    'items' => $data
+  );
+
+  // Create some error handling
+  if ( empty( $data ) ) {
+    return new WP_Error( 'no_books', 'Book data not available', array( 'status' => 404 ) );
+  }
+
+  return rest_ensure_response( $response_array );
 }
 
 function booklist_single_book_api_endpoint_callback($request) {
@@ -113,7 +128,13 @@ function booklist_single_book_api_endpoint_callback($request) {
     );
   }
 
-  return $results;
+    // Construct the array that will be converted into a WP_REST_Response object
+  $response_array = array(
+    'message' => 'Book response success!',
+    'item' => $results
+  );
+
+  return rest_ensure_response( $response_array );
 
 }
 
