@@ -60,13 +60,18 @@ function booklist_all_books_api_endpoint_callback( $request ) {
 
   // Construct the array that will be converted into a WP_REST_Response object
   $response_array = array(
+    'code' => 'books_success',
     'message' => 'Books response success!',
-    'items' => $data
+    'data' => array(
+      'status' => 200,
+      'items' => $data
+    )
   );
-
+  
   // Create some error handling
   if ( empty( $data ) ) {
     return new WP_Error( 'no_books', 'Book data not available', array( 'status' => 404 ) );
+
   }
 
   return rest_ensure_response( $response_array );
@@ -88,7 +93,7 @@ function booklist_single_book_api_endpoint_callback($request) {
 
 
   if ( empty( $books ) ) {
-    return new WP_Error( 'no_book', 'Invalid book', array( 'status' => 404 ) );
+    return new WP_Error( 'no_book', 'Invalid book title', array( 'status' => 404 ) );
   }
   else {
     $bookId = $books[0]->ID;
@@ -130,8 +135,12 @@ function booklist_single_book_api_endpoint_callback($request) {
 
     // Construct the array that will be converted into a WP_REST_Response object
   $response_array = array(
+    'code' => 'book_success',
     'message' => 'Book response success!',
-    'item' => $results
+    'data' => array(
+      'status' => 200,
+      'items' => $results
+    )
   );
 
   return rest_ensure_response( $response_array );
