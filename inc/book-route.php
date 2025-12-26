@@ -41,7 +41,7 @@ function booklist_all_books_api_endpoint_callback( $request ) {
           'bookNumber' => get_field('book_number'),
           'publishDate' => get_field('publish_date'),
           'length' => get_field('length'),
-          'rating' => get_field('rating'),
+          'rating' => newRatingValue(get_field('rating')),
           'spice' => get_field('spice'),
           'finished' => get_field('finished'),
           'amountCompleted' => get_field('amount_completed'),
@@ -103,6 +103,7 @@ function booklist_single_book_api_endpoint_callback($request) {
     $tropeArray = createTermArray($bookId, 'trope');
     $creatureArray = createTermArray($bookId, 'creature');
     $booktagArray = createTermArray($bookId, 'booktag');
+    
 
     $results = array(
       'bookId' => $bookId,
@@ -118,7 +119,7 @@ function booklist_single_book_api_endpoint_callback($request) {
         'bookNumber' => get_field('book_number', $bookId),
         'publishDate' => get_field('publish_date', $bookId),
         'length' => get_field('length', $bookId),
-        'rating' => get_field('rating', $bookId),
+        'rating' => newRatingValue(get_field('rating', $bookId)),
         'spice' => get_field('spice', $bookId),
         'finished' => get_field('finished', $bookId),
         'amountCompleted' => get_field('amount_completed', $bookId),

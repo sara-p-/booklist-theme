@@ -24,3 +24,31 @@ function createTermArray($postId, $termName) {
 
     return $termArray;
 }
+
+/**
+ * Translates the 1-10 rating range into a 1-5 rating range
+ *
+ * When given the rating value, this function will translate it into a new rating value.
+ *
+ * @param string rating value.
+ * @return string New rating value.
+ */
+function newRatingValue($oldRating) {
+  $number = (int) $oldRating;
+  if($number <= 5) {
+    return '1';
+  } 
+  if($number === 6) {
+    return '2';
+  }
+  if($number === 7) {
+    return '3';
+  }
+  if($number === 8) {
+    return '4';
+  }
+  if($number >= 9) {
+    return '5';
+  }
+
+}
